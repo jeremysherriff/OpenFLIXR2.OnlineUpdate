@@ -6,19 +6,13 @@ THISUSER=$(whoami)
            exit 1
     fi
 
-exec 1> >(tee -a /var/log/openflixrupdate/c_update_3.log) 2>&1
+exec 1> >(tee -a /var/log/openflixrupdate/g_update_7.log) 2>&1
 TODAY=$(date)
 echo "-----------------------------------------------------"
 echo "Date:          $TODAY"
 echo "-----------------------------------------------------"
 
-## OpenFLIXR Update version 2.0.1
-
-# fixes
-pihole -b analytics.plex.tv
-cd /var/lib/plexmediaserver/Library/Application\ Support/Plex\ Media\ Server/
-rm Preferences.xml
-service plexmediaserver restart
+## OpenFLIXR Update version 2.4.3
 
 ## let system know update has been installed
-touch /opt/update/doneupdate/c_update_3
+touch /opt/update/doneupdate/g_update_7

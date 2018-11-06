@@ -1,0 +1,56 @@
+#!/bin/bash
+THISUSER=$(whoami)
+    if [ $THISUSER != 'root' ]
+        then
+            echo 'You must use sudo to run this script, sorry!'
+           exit 1
+    fi
+
+exec 1> >(tee -a /var/log/openflixrupdate/f_update_6.log) 2>&1
+TODAY=$(date)
+echo "-----------------------------------------------------"
+echo "Date:          $TODAY"
+echo "-----------------------------------------------------"
+
+## OpenFLIXR Update version 2.4
+
+# misc
+cp /opt/update/updates/configs/nginx.conf /etc/nginx/nginx.conf
+rm -rf /opt/autosub
+git clone https://github.com/BenjV/autosub /opt/autosub
+cp /opt/update/updates/configs/config.properties /opt/autosub
+
+# htpc manager openflixr theme
+mkdir /opt/HTPCManager/interfaces/default/css/themes/openflixr
+cp /opt/update/updates/htpcmanager/openflixr/* /opt/HTPCManager/interfaces/default/css/themes/openflixr
+
+# Lidarr
+cp /opt/update/updates/configs/lidarr.service /etc/systemd/system/
+systemctl enable lidarr.service
+mkdir /opt/Lidarr
+link=$(wget -q https://github.com/lidarr/Lidarr/releases/latest -O - | grep -i href | grep -i linux.tar.gz | awk -F "[\"]" '{print $2}')
+latestver=$(echo $link | awk -F "[\/]" '{print $6}')
+latestverurl=$(echo $link | awk -F "[\/]" '{print $1"/"$2"/"$3"/"$4"/"$5"/"$6"/"$7}')
+link='https://github.com'$latestverurl
+cd /tmp/
+wget -q $link || echo 'Download failed!'
+tar -xvf Lidarr*
+cp -r -u Lidarr*/* /opt/Lidarr/
+rm -rf Lidarr*/
+rm Lidarr.develop.*
+chown openflixr:openflixr -R /opt/Lidarr
+
+sed -i '/# add_config_2/a \
+location /lidarr {\
+    proxy_pass http:\/\/127.0.0.1:8686;\
+    proxy_set_header Host $host;\
+    proxy_set_header X-Real-IP $remote_addr;\
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\
+        }\
+' /etc/nginx/sites-enabled/reverse
+
+cp /opt/update/updates/monit/lidarr /etc/monit/conf.d/lidarr
+cp /opt/update/updates/monit/lidarr /opt/config/monit/lidarr
+
+## let system know update has been installed
+touch /opt/update/doneupdate/f_update_6

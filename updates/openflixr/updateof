@@ -12,6 +12,31 @@ THISUSER=$(whoami)
             exit  1
     fi
 
+## OpenFLIXR
+echo ""
+echo "OpenFLIXR updates:"
+cd /opt/update
+git pull
+cp /opt/update/updates/openflixr/apt-get-queue /opt/openflixr/apt-get-queue
+cp /opt/update/updates/openflixr/blocklist.sh /opt/openflixr/blocklist.sh
+chmod +x /opt/openflixr/blocklist.sh
+cp /opt/update/updates/openflixr/checkinet /opt/openflixr/checkinet
+chmod +x /opt/openflixr/checkinet
+cp /opt/update/updates/openflixr/purgeoldkernels /opt/openflixr/purgeoldkernels
+chmod +x /opt/openflixr/purgeoldkernels
+cp /opt/update/updates/openflixr/startup.sh /opt/openflixr/startup.sh
+chmod +x /opt/openflixr/startup.sh
+cp /opt/update/updates/openflixr/updatewkly.sh /opt/openflixr/updatewkly.sh
+chmod +x /opt/openflixr/updatewkly.sh
+cp /opt/update/updates/openflixr/updateof /opt/openflixr/updateof
+chmod +x /opt/openflixr/updateof
+cp /opt/update/updates/openflixr/createdirs /opt/openflixr/createdirs
+chmod +x /opt/openflixr/createdirs
+cp /opt/update/updates/openflixr/logio.sh /opt/openflixr/logio.sh
+chmod +x /opt/openflixr/logio.sh
+cp /opt/update/updates/openflixr/hotfixes /opt/openflixr/hotfixes
+cp /opt/update/updates/monit/* /etc/monit/conf.d/
+
 ## Pip Apps
 echo ""
 echo "Home-Assistant:"
@@ -26,8 +51,8 @@ echo ""
 echo "Mopidy-Moped:"
 sudo -H pip install --upgrade Mopidy-Moped
 echo ""
-echo "Mopidy-Spotmop:"
-sudo -H pip install --upgrade Mopidy-Spotmop
+echo "Mopidy-Iris:"
+sudo -H pip install --upgrade Mopidy-Iris
 echo ""
 echo "pafy:"
 sudo -H pip install --upgrade pafy
@@ -39,12 +64,13 @@ sudo -H pip install --upgrade Mopidy-WebSettings
 cd /opt/openflixr
 echo ""
 echo "create download dirs:"
-sudo bash createdirs
+bash createdirs
 
 ## Git Apps
 echo ""
 echo "OpenFLIXR Wizard Update:"
 cd /usr/share/nginx/html/setup
+rm /usr/share/nginx/html/setup/.git/index.lock
 git reset --hard
 git pull
 echo ""
@@ -55,7 +81,9 @@ git pull
 echo ""
 echo "CouchPotato:"
 cd /opt/CouchPotato
-git pull
+git fetch --all
+git reset --hard origin/master
+git pull origin master
 /usr/sbin/service couchpotato restart
 echo ""
 echo "Headphones:"
@@ -93,6 +121,7 @@ git pull
 echo ""
 echo "AutoSub:"
 cd /opt/autosub
+git reset --hard
 git pull
 /usr/sbin/service autosub restart
 echo ""
@@ -118,17 +147,38 @@ echo "Groovy:"
 cd /opt/groovy
 git pull
 echo ""
-echo "NZBhydra:"
-cd /opt/nzbhydra
-git pull
+echo "NZBhydra2:"
+ wasactive=$(systemctl is-active nzbhydra2)
+ link=$(wget -q https://github.com/theotherp/nzbhydra2/releases/latest -O - | grep -i href | grep -i linux.zip | awk -F "[\"]" '{print $2}')
+ latestver=$(echo $link | awk -F "[\/]" '{print $6}')
+ latestverurl=$(echo $link | awk -F "[\/]" '{print $1"/"$2"/"$3"/"$4"/"$5"/"$6"/"$7}')
+ link='https://github.com'$latestverurl
+ # Write some stuff to the log so we know what happened if it goes wrong
+ echo latestver = $latestver
+   echo "NZBhydra2 needs updating"
+   echo "download link = $link"
+   service nzbhydra2 stop
+   cd /tmp/
+   rm nzbhydra2* 2> /dev/null
+   wget -q $link || echo 'Download failed!'
+   unzip -o nzbhydra2*.zip -d /opt/nzbhydra2/
+   rm nzbhydra2* 2> /dev/null
+   chown openflixr: -R /opt/nzbhydra2
+   if [ $wasactive == "active" ]
+   then
+     echo "Starting NZBhydra2 after update"
+     service nzbhydra2 start
+   else
+     echo "NZBhydra2 was not running before, so not starting it now"
+   fi
 echo ""
 echo "LazyLibrarian:"
 cd /opt/LazyLibrarian
 git reset --hard
 git pull
 echo ""
-echo "Plexupdate:"
-cd /opt/plexupdate
+echo "Ubooquity Plex Theme:"
+cd /opt/ubooquity/themes/plextheme
 git pull
 echo ""
 echo "Cleanup:"
@@ -136,14 +186,14 @@ rm /usr/share/nginx/html/setup/setup.sh 2> /dev/null
 echo ""
 echo "hotfixes:"
 /sbin/ethtool -K eth0 gso off gro off tso off
-service home-assistant restart 
+service home-assistant restart
 echo ""
 echo "Set Version"
 version=$(crudini --get /usr/share/nginx/html/setup/config.ini custom custom1)
 sed -i 's/Version.*/Version '$version'<\/span>/' /usr/share/nginx/html/openflixr/index.html
 
+## hotfixes
+bash /opt/openflixr/hotfixes
+
 ## User script
 bash /opt/openflixr/userscript.sh
-
-## Update OpenFLIXR Online
-updateopenflixr

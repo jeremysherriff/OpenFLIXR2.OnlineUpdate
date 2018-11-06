@@ -13,7 +13,7 @@ echo "-----------------------------------------------------"
 echo "Date:          $TODAY"
 echo "-----------------------------------------------------"
 
-## OpenFLIXR Online Update version 1.0.3
+## OpenFLIXR Online Update version 1.0.5
 echo ""
 echo "OpenFLIXR Wizard Update:"
 cd /usr/share/nginx/html/setup
