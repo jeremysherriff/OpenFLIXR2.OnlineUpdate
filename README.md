@@ -1,3 +1,12 @@
+This is my dev branch of mfrelink's OpenFLIXR online updater.  My intention is to provide critical patches and fixes to keep this project going while the guy we know as mediajunkie takes a break.
+
+To switch to this repository, run the following in an SSH session (all on one line):
+> wget -O /tmp/switch-to-dev.sh https://github.com/jeremysherriff/OpenFLIXR2.OnlineUpdate/raw/dev/updates/openflixr/switch-to-dev.sh && sudo bash /tmp/switch-to-dev.sh
+
+This will also add a revert script to enable you to go back to the original setup at any time.
+Simply run the following to revert:
+> sudo /opt/openflixr/revert-of.sh
+
 # OpenFLIXR Media Server
 OpenFLIXR Media Server is an all-in-one media server for automated downloading and serving media. Tools like CouchPotato, SickRage, Headphones and SABnzbd to download and Plex Media Server to bring everything to your screens. Be it tablets, TVs, PCs, you name it. Completely web-based and includes monitoring and management tools.
 
