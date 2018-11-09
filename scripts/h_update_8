@@ -30,12 +30,11 @@ sed -i 's/index index.html index.php;/index index.php;/' /etc/nginx/sites-enable
 
 # lidarr fix
 mkdir /home/openflixr/.config/Lidarr
-chmod +777 -R /home/openflixr/.config/Lidarr
-chown openflixr: -R /home/openflixr/.config/Lidarr
-
 if [ ! -f /home/openflixr/.config/Lidarr/config.xml ]; then
   cp /opt/update/updates/configs/config.xml /home/openflixr/.config/Lidarr/config.xml
 fi
+chmod +777 -R /home/openflixr/.config/Lidarr
+chown openflixr: -R /home/openflixr/.config/Lidarr
 
 # ombi fix
 cp /opt/update/updates/configs/ombi.service /etc/systemd/system/ombi.service
