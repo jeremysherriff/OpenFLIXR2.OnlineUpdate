@@ -1,0 +1,60 @@
+#!/bin/bash
+THISUSER=$(whoami)
+    if [ $THISUSER != 'root' ]
+        then
+            echo 'You must use sudo to run this script, sorry!'
+           exit 1
+    fi
+
+exec 1> >(tee -a /var/log/openflixrupdate/j_patch_01.log) 2>&1
+TODAY=$(date)
+echo "-----------------------------------------------------"
+echo "Date:          $TODAY"
+echo "-----------------------------------------------------"
+
+## OpenFLIXR Patch 1
+
+# Install SickChill
+cd /opt
+git clone https://github.com/SickChill/SickChill.git /opt/sickchill
+
+if [ $? ]; then
+# If the git clone failed, it's probably because sickchill has already been manually set up
+# so record this script as done and don't try again
+
+# Disable sickrage
+systemctl stop monit
+systemctl stop sickrage
+systemctl disable sickrage
+systemctl reset-failed
+
+#Copy over config from sickrage
+cp /opt/sickrage/sickbeard.db /opt/sickchill/sickbeard.db
+cp /opt/sickrage/config.ini /opt/sickchill/config.ini
+sed -i 's/git_remote_url.*/git_remote_url = https:\/\/github.com\/SickChill\/SickChill.git/' /opt/sickrage/config.ini
+chown openflixr: -R /opt/sickchill
+
+# Copy out Monit config
+cp /opt/update/updates/monit/sickchill /opt/config/monit/sickchill
+cp /opt/update/updates/monit/sickchill /etc/monit/conf.d/sickchill
+
+# Set up sickchill service and autostart
+cp /opt/update/updates/configs/sickchill.service /etc/systemd/system/sickchill.service
+systemctl daemon-reload
+systemctl enable sickchill
+
+# Clean-up
+mv /opt/sickrage /opt/sickrage.old
+mv /etc/init.d/sickchill /etc/init.d/sickchill.old
+mv /etc/default/sickrage /etc/default/sickrage.old
+rm /etc/monit/conf.d/sickrage
+rm /etc/systemd/system/sickrage.service
+
+# Start the engines!
+systemctl start sickchill
+systemctl start monit
+
+fi
+
+## let system know update has been installed
+touch /opt/update/doneupdate/j_patch_01

@@ -108,8 +108,8 @@ cd /opt/plexpy
 git pull
 /usr/sbin/service plexpy restart
 echo ""
-echo "SickRage:"
-cd /opt/sickrage
+echo "SickChill:"
+cd /opt/sickchill
 git fetch --all
 git reset --hard origin/master
 git pull origin master

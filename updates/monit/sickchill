@@ -1,0 +1,4 @@
+check process SickChill with pidfile /home/openflixr/.sickchill.pid
+    start program = "/bin/systemctl start sickchill"
+    stop program = "/bin/systemctl stop sickchill"
+    if failed host 127.0.0.1 port 8081 then restart

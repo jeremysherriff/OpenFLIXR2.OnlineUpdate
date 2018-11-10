@@ -1,3 +1,6 @@
+Patch 01
+- Install SickChill, retire SickRage (scripts/j_patch_01)
+
 Patch 0.02 - Initial release
 - Created CHANGELOG
 - Made Sub-Zero an update instead of delete/reinstall
