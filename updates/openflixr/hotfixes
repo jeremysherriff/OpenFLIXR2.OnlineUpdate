@@ -3,7 +3,7 @@ service monit stop
 
 # Fix for Lidarr conf file permissions
 echo ""
-echo "hotfix: Lidarr config.xml permissions
+echo "hotfix: Lidarr config.xml permissions"
 chmod +777 /home/openflixr/.config/Lidarr/config.xml
 chown openflixr: /home/openflixr/.config/Lidarr/config.xml
 systemctl restart lidarr
