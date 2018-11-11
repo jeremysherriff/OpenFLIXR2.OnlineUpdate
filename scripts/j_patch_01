@@ -45,7 +45,7 @@ systemctl enable sickchill
 
 # Clean-up
 mv /opt/sickrage /opt/sickrage.old
-mv /etc/init.d/sickchill /etc/init.d/sickchill.old
+mv /etc/init.d/sickrage /etc/init.d/sickrage.old
 mv /etc/default/sickrage /etc/default/sickrage.old
 rm /etc/monit/conf.d/sickrage
 rm /etc/systemd/system/sickrage.service
