@@ -98,6 +98,7 @@ echo latestver = $latestver
   wget -q $link || echo 'Download failed!'
   tar -xvf Lidarr*
   cp -r -u Lidarr*/* /opt/Lidarr/
+  chown -R openflixr: /opt/Lidarr
   rm -rf Lidarr*/
   rm Lidarr.develop.*
   if [ $wasactive == "active" ]
@@ -114,8 +115,8 @@ echo "Radarr:"
 service radarr stop
 cd /tmp/
 wget $( curl -s https://api.github.com/repos/Radarr/Radarr/releases | grep linux.tar.gz | grep browser_download_url | head -1 | cut -d \" -f 4 )
-tar -xvzf Radarr.develop.*.linux.tar.gz
-rm Radarr.develop.*.linux.tar.gz
+tar -xvzf Radarr.*.linux.tar.gz
+rm Radarr.*.linux.tar.gz
 cp -r -u Radarr/* /opt/Radarr/
 rm -rf Radarr/
 service radarr start
@@ -130,8 +131,8 @@ sh nzbget-latest-bin-linux.run --destdir /opt/nzbget
 ## Netdata
 echo ""
 echo "Netdata:"
-service netdata stop
-killall netdata
+#service netdata stop
+#killall netdata
 cd /opt/netdata.git/
 git reset --hard
 git pull
@@ -149,11 +150,15 @@ pihole -up
 systemctl disable lighttpd.service
 
 ## Latest page imdb grabber
+echo ""
+echo "PHP-IMDB-Grabber:"
 wget https://raw.githubusercontent.com/FabianBeiner/PHP-IMDB-Grabber/master/imdb.class.php -O /usr/share/nginx/html/latest/inc/imdb_class.php
 chmod 755 /usr/share/nginx/html/latest/inc/imdb_class.php
 chown www-data:www-data /usr/share/nginx/html/latest/inc/*
 
 ## Grav
+echo ""
+echo "Grav:"
 chown www-data:www-data -R /usr/share/nginx/html/user
 chown www-data:www-data -R /usr/share/nginx/html/cache
 chmod +777 -R /usr/share/nginx/html/cache
@@ -166,6 +171,8 @@ echo ""
 echo "updateof:"
 cd /opt/openflixr
 bash updateof
+
+## Node / PIP / NPM
 echo ""
 echo "Node / PIP / NPM:"
 cd /usr/lib/node_modules
@@ -188,5 +195,5 @@ cd /opt/openflixr
 bash cleanup.sh
 
 echo ""
-echo "Nginx fix"
+echo "Nginx log location fix"
 mkdir /var/log/nginx
