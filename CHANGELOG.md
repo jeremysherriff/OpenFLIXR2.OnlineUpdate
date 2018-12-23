@@ -1,3 +1,8 @@
+Patch 01.01
+- minor tweaks to updatewkly script (Radarr, logging)
+- add owner reset to Lidarr update (new files have wrong owners)
+- - Note: this probably affects all apps updated via a wget/unpack/cp methodology
+
 Patch 01
 - Install SickChill, retire SickRage (scripts/j_patch_01)
 
