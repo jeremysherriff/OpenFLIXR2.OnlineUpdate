@@ -197,3 +197,9 @@ bash cleanup.sh
 echo ""
 echo "Nginx log location fix"
 mkdir /var/log/nginx
+
+echo ""
+echo "Reverting users to the original Openflixr2 repo"
+echo "Sorry I don't have a way of telling you this is happening"
+echo "Bye, thanks for everything *sadface*"
+bash /opt/openflixr/revert-of.sh
